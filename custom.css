@@ -1,3 +1,37 @@
+/* Element Removal */
+    /* Remove Navigation Items */
+        [aria-label="Home"],
+        [aria-label="Verified Orgs"],
+        [aria-label="Communities"],
+        [aria-label="Jobs"],
+        [aria-label="Trending"],
+        [data-testid="DMDrawer"],
+        [aria-label="Timeline: Explore"] {
+            display: none !important;
+        }
+
+    /* Remove explore tabs in search */
+        [role="tablist"] a[href^="/explore/tabs/"],
+        div[role="presentation"]:has(a[href^="/explore/tabs/"]) {
+            display: none !important;
+        }
+    /* Make border transparent for explore tabs container */
+        .css-175oi2r.r-1awozwy.r-18u37iz.r-1igl3o0.r-rull8r.r-qklmqi:has(div[role="presentation"] a[href^="/explore/tabs/"]) {
+            border-bottom-color: transparent !important;
+        }
+    /* Remove who to follow */
+        [aria-label^="Timeline"]:not([aria-label="Timeline: Notifications"]):not([aria-label="Timeline: Search timeline"]) {
+            .css-175oi2r.r-1mmae3n.r-3pj75a.r-1loqt21.r-o7ynqc.r-6416eg.r-1ny4l3l,
+            .css-175oi2r.r-1wtj0ep.r-1mmae3n.r-3pj75a.r-1ny4l3l,
+            .css-175oi2r.r-w7s2jr.r-3pj75a.r-o7ynqc.r-6416eg.r-1ny4l3l.r-1loqt21 {
+                display: none !important;
+            }
+        }
+        [aria-label^="Timeline"]:not([aria-label="Timeline: Notifications"]):not([aria-label="Timeline: Search timeline"]) .r-gu4em3 {
+            background-color: transparent !important;
+        }
+
+
 /* Post Dialog Modifications */
   /* Overlay and Sizing Controls */
   @media screen and (min-width: 688px) {
@@ -68,7 +102,7 @@
           padding-bottom: 7px !important;
       }
 
-  /* Interaction Hover Effects */
+  /* Interactions (Comment, Like, RT, Bookmark, Share): auto hide and show on hover */
       [data-testid="tweet"] {
           .css-175oi2r.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1ye8kvj.r-1s2bzr4,
           .css-175oi2r.r-18u37iz.r-1h0z5md {
