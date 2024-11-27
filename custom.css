@@ -1,0 +1,123 @@
+/* Post Dialog Modifications */
+  /* Overlay and Sizing Controls */
+  @media screen and (min-width: 688px) {
+      /* Block scrolling when post dialog is present */
+          body:has([data-testid="tweetButton"], [aria-label="Drafts"], [role="dialog"]) [role="main"] {
+              height: 100vh;
+              overflow: hidden;
+          }
+
+      /* Apply black overlay behind post dialog */
+          body:has(.css-175oi2r.r-1wbh5a2.r-htvplk.r-1udh08x.r-1867qdf.r-rsyp9y.r-1pjcn9w.r-1potc6q, 
+                  [data-testid="tweetButton"], 
+                  [aria-label="Drafts"]) [role="main"]::after {
+              content: '';
+              position: fixed;
+              inset: 0;
+              background: rgba(0, 0, 0, 1);
+              z-index: 0;
+          }
+
+      /* Set post dialog size constraints */
+          body:has([data-testid="tweetButton"], 
+                  [aria-label="Drafts"], 
+                  [role="progressbar"]) .css-175oi2r.r-1ny4l3l.r-18u37iz.r-1pi2tsx.r-1777fci.r-1xcajam.r-ipm5af.r-g6jmlv.r-1habvwh {
+              height: fit-content !important;
+              width: fit-content !important;
+              padding-left: 70px !important;
+          }
+
+      /* Adjust dialog position area */
+          [role="group"] {
+              position-area: top !important;
+          }
+  }
+
+  /* UI Element Removals */
+      /* Remove mask and buttons */
+      body:has([data-testid="tweetButton"], [aria-label="Drafts"], [role="progressbar"]) {
+          div[data-testid="twc-cc-mask"],
+          div[data-testid="mask"] { 
+              display: none !important;
+          }
+
+          .css-175oi2r.r-1pz39u2.r-1777fci.r-15ysp7h.r-1habvwh.r-s8bhmr > button[aria-label="Close"] {
+              display: none !important;
+              pointer-events: none !important;
+          }
+      }
+
+      /* Remove back button */
+      body:has([data-testid="tweetButton"]) .css-175oi2r.r-1pz39u2.r-1777fci.r-15ysp7h.r-1habvwh.r-s8bhmr > button[aria-label="Back"] {
+          display: none !important;
+          pointer-events: none !important;
+      }
+
+/* Tweet Modifications */
+  /* Tweet Spacing */
+      [data-testid="tweet"]:not(:has(.css-175oi2r.r-1bnu78o.r-f8sm7e.r-m5arl1.r-1p0dtai.r-1d2f490.r-u8s1d.r-zchlnj.r-ipm5af)) {
+          margin-top: 17px !important;
+      }
+
+  /* Interaction Button Spacing */
+      .css-175oi2r.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1ye8kvj.r-1s2bzr4 {
+          margin-top: 7px !important;
+      }
+
+      .r-kzbkwu {
+          padding-bottom: 7px !important;
+      }
+
+  /* Interaction Hover Effects */
+      [data-testid="tweet"] {
+          .css-175oi2r.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1ye8kvj.r-1s2bzr4,
+          .css-175oi2r.r-18u37iz.r-1h0z5md {
+              opacity: 0;
+              transition: opacity 0.2s ease;
+          }
+
+          &:hover {
+              .css-175oi2r.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1ye8kvj.r-1s2bzr4,
+              .css-175oi2r.r-18u37iz.r-1h0z5md {
+                  opacity: 1;
+              }
+          }
+      }
+
+/* Layout Modifications */
+  /* Sidebar Positioning */
+      .r-obd0qt {
+          align-items: flex-start !important;
+      }
+
+  /* Timeline Dimensions */
+      .r-1ye8kvj {
+          max-width: 700px !important;
+      }
+
+      .r-htvplk {
+          min-width: 700px !important;
+      }
+
+  /* Remove Column Separators */
+      [data-testid="primaryColumn"] {
+          border-color: transparent !important;
+      }
+
+/* List Page Modifications */
+  /* Hide Recommendations */
+      [aria-label="Timeline: Your Lists"] {
+          div.css-175oi2r:nth-of-type(3),
+          div.css-175oi2r:nth-of-type(4),
+          div.css-175oi2r:nth-of-type(5) {
+              > .r-1ny4l3l.r-1adg3ll.css-175oi2r > .css-175oi2r > .r-1loqt21.r-1ny4l3l.r-6416eg.r-o7ynqc.r-3pj75a.r-1mmae3n.r-kemksi.css-175oi2r {
+                  display: none !important;
+              }
+          }
+      }
+
+  /* Hide Suggested Lists */
+      a[href="/i/lists/suggested"],
+      a[href="/i/lists/suggested"] .css-175oi2r {
+          display: none !important;
+      }
