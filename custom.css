@@ -20,7 +20,7 @@
             border-bottom-color: transparent !important;
         }
     /* Remove who to follow */
-        [aria-label^="Timeline"]:not([aria-label="Timeline: Notifications"]):not([aria-label="Timeline: Search timeline"]) {
+        [aria-label*="Timeline"][aria-label*="posts"]{
             .css-175oi2r.r-1mmae3n.r-3pj75a.r-1loqt21.r-o7ynqc.r-6416eg.r-1ny4l3l,
             .css-175oi2r.r-1wtj0ep.r-1mmae3n.r-3pj75a.r-1ny4l3l,
             .css-175oi2r.r-w7s2jr.r-3pj75a.r-o7ynqc.r-6416eg.r-1ny4l3l.r-1loqt21 {
