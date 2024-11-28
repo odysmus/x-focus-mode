@@ -1,3 +1,4 @@
+// Content filtering - remove sections and posts with specified words
 (function() {
     'use strict';
 
