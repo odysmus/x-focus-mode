@@ -30,8 +30,8 @@ Tired of wasting hours to mindless scrolling? Transform your X experience from a
 
 ### 📄 [content-filter.js](https://github.com/odysmus/X-Focus-Mode/blob/main/content-filter.js)
 Curate the content you want to see, remove unwanted posts from capturing your attention.
-- 🔥 Section Removal: Discover more, More replies, Posts from muted accounts
-- 🎯 Removes all posts that contain the word or group of words you add into:
+- 🔥 Removes the following sections: Discover more, More replies, Posts from muted accounts
+- 🔍 Removes all posts and search results that contain the word or group of words you add into:
   > const BLOCKED_WORDS = ['word','two words','just three words'];
 
 # How to use
