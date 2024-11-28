@@ -24,15 +24,15 @@ Puts you in control of your timeline, curate your inputs with accounts that alig
 - 🔄 Auto-redirects from "For you" to "Following" feed
 - 🔥 Removes all "For you" tab appearances
 
-### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
-Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
-- 🏠 Automatically redirects from home timeline to your profile. Your profile is home now.
-
 ### 📄 [content-filter.js](https://github.com/odysmus/X-Focus-Mode/blob/main/content-filter.js)
 Curate the content you want to see, remove unwanted posts from capturing your attention.
 - 🔥 Removes the following sections: Discover more, More replies, Posts from muted accounts
 - 🔍 Removes all posts and search results that contain the word or group of words you add into:
   > const BLOCKED_WORDS = ['word','two words','just three words'];
+
+### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
+Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
+- 🏠 Automatically redirects from home timeline to your profile. Your profile is home now.
 
 # How to use
 OPTION 1: Install a browser with the ability to customize sites like [Arc browser](https://arc.net/). For Arc, create a "New Boost" while on x.com, copy and paste the code into the boost floating window. Css code into css tab and viceversa for js. Restart tab and enjoy. (I do this)
