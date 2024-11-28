@@ -13,14 +13,23 @@ A thoughtfully crafted essentialist visual overhaul.
 - 🔥 Removes visual noise (right sidebar, who to follow, trending, +)
 
 #### 📄 [keep-writing.js](https://github.com/odysmus/X-Focus-Mode/blob/main/keep-writing.js)
+> [!IMPORTANT] Add at the top of your JS file for the code to work
 Transform the posting experience into a focused writing environment, letting you maintain your creative flow without interruption. Enables consecutive posting without getting distracted by the feed.
 - 📍 Stays on the dedicated posting page (x.com/compose/post)
 - ✋ Prevents automatic redirect to home feed after posting
+
+### Intentional Usage
 
 #### 📄 [remove-for-you.js](https://github.com/odysmus/X-Focus-Mode/blob/main/remove-for-you.js)
 Puts you in control of your timeline, curate your inputs with accounts that align with your vision.
 - 🔄 Auto-redirects from "For you" to "Following" feed
 - 🔥 Removes all "For you" tab appearances
+
+  OR
+
+#### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
+Use X as a posting tool. Completely disable the home timeline, your profile becomes home.
+- 🏠 Automatically redirects from home timeline to your profile
 
 
 ## How to use
