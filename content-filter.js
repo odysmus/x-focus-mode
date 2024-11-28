@@ -3,14 +3,22 @@
     'use strict';
 
     // Configuration arrays for content filtering
-    // BLOCKED_SECTIONS: Hides UI sections and their following content (e.g., "Discover more" recommendations)
     const BLOCKED_SECTIONS = ['Discover more', 'More replies'];
     
-    // BLOCKED_WORDS: Add space-separated words to filter (case-insensitive)
-    // Example: const BLOCKED_WORDS = `test tweet remove`.trim().split(/\s+/).filter(Boolean); 
-                // This would remove all posts with the words test or tweet or remove
-    // Leave empty to show all tweets → const BLOCKED_WORDS = ``.trim().split(/\s+/).filter(Boolean);
-    const BLOCKED_WORDS = ``.trim().split(/\s+/).filter(Boolean);
+    // BLOCKED_WORDS: Add word groups, each group is treated as an AND condition
+    // Examples:
+    // ['words'] → removes posts containing "words"
+    // ['two words'] → removes posts containing both "two" AND "words"
+    // ['word', 'two words', 'just three words'] → removes posts containing:
+    //    - "word" OR
+    //    - ("two" AND "words") OR
+    //    - ("just" AND "three" AND "words")
+    const BLOCKED_WORDS = [
+        // Add your word groups here
+        // 'word',
+        // 'two words',
+        // 'just three words'
+    ];
 
     // Text that appears on posts from muted accounts
     const MUTED_TEXT = 'This Post is from an account you muted.';
@@ -34,8 +42,19 @@
     }
 
     /**
-     * Filters tweets containing any words from BLOCKED_WORDS
-     * Searches tweet text content and hides the entire tweet if matches are found
+     * Checks if text contains all words in a group
+     * @param {string} text - The text to check
+     * @param {string} wordGroup - Space-separated words that must all be present
+     * @returns {boolean} True if all words are found
+     */
+    function containsAllWords(text, wordGroup) {
+        const words = wordGroup.toLowerCase().split(/\s+/);
+        return words.every(word => text.includes(word));
+    }
+
+    /**
+     * Filters tweets containing word groups from BLOCKED_WORDS
+     * For each word group, all words in that group must be present to trigger hiding
      * Case-insensitive matching
      */
     function hideBlockedContent() {
@@ -43,7 +62,8 @@
         
         posts.forEach(post => {
             const text = post.textContent.toLowerCase();
-            if (BLOCKED_WORDS.some(word => text.includes(word.toLowerCase()))) {
+            // Check if any word group matches (OR condition between groups)
+            if (BLOCKED_WORDS.length > 0 && BLOCKED_WORDS.some(group => containsAllWords(text, group))) {
                 const tweet = post.closest('div[data-testid="cellInnerDiv"]');
                 if (tweet) tweet.style.display = 'none';
             }
