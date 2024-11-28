@@ -13,7 +13,7 @@ A thoughtfully crafted essentialist visual overhaul.
 - 🔥 Removes visual noise (right sidebar, who to follow, trending, +)
 
 ### 📄 [keep-writing.js](https://github.com/odysmus/X-Focus-Mode/blob/main/keep-writing.js)
-> ⚠️ Add at the top of your JS file for the code to work
+> ⚠️ If you want to use this feature add it to the top of your JS file for the code to work
 
 Transform the posting experience into a focused writing environment, letting you maintain your creative flow without interruption. Enables consecutive posting without getting distracted by the feed.
 - 📍 Stays on the dedicated posting page (x.com/compose/post)
