@@ -5,28 +5,23 @@
     // Configuration arrays for content filtering
     const BLOCKED_SECTIONS = ['Discover more', 'More replies'];
     
-    // BLOCKED_WORDS: Add word groups, each group is treated as an AND condition
+    // BLOCKED_WORDS_POSTS: Word groups to filter from tweets
     // Examples:
     // ['words'] → removes posts containing "words"
     // ['two words'] → removes posts containing both "two" AND "words"
-    // ['word', 'two words', 'just three words'] → removes posts containing:
-    //    - "word" OR
-    //    - ("two" AND "words") OR
-    //    - ("just" AND "three" AND "words")
-    const BLOCKED_WORDS = [
-        // Add your word groups here
-        // 'word',
-        // 'two words',
-        // 'just three words'
-    ];
+    // ['word', 'two words'] → removes posts containing "word" OR ("two" AND "words")
+    const BLOCKED_WORDS_POSTS = [];
+
+    // BLOCKED_WORDS_SEARCH_SUGGESTIONS: Word groups to filter from search suggestions
+    // Uses the same format as BLOCKED_WORDS_POSTS but applies only to search resultS
+    // This doesn't filter the posts you see when searching, to filter those use BLOCKED_WORDS_POSTS
+    const BLOCKED_WORDS_SEARCH_SUGGESTIONS = [];
 
     // Text that appears on posts from muted accounts
     const MUTED_TEXT = 'This Post is from an account you muted.';
 
     /**
      * Scans for and hides UI sections like "Discover more" or "More replies"
-     * Looks for headings within tweet containers and hides matching sections
-     * Also removes all following sibling elements to prevent partial content
      */
     function hideUnwantedSections() {
         const elements = document.querySelectorAll('div[data-testid="cellInnerDiv"]');
@@ -53,26 +48,29 @@
     }
 
     /**
-     * Filters tweets and search results containing word groups from BLOCKED_WORDS
+     * Filters tweets based on BLOCKED_WORDS_POSTS
      * For each word group, all words in that group must be present to trigger hiding
-     * Case-insensitive matching
      */
-    function hideBlockedContent() {
-        // Filter tweets
+    function hideBlockedPosts() {
         const posts = document.querySelectorAll('div[data-testid="tweetText"]');
         posts.forEach(post => {
             const text = post.textContent.toLowerCase();
-            if (BLOCKED_WORDS.length > 0 && BLOCKED_WORDS.some(group => containsAllWords(text, group))) {
+            if (BLOCKED_WORDS_POSTS.length > 0 && BLOCKED_WORDS_POSTS.some(group => containsAllWords(text, group))) {
                 const tweet = post.closest('div[data-testid="cellInnerDiv"]');
                 if (tweet) tweet.style.display = 'none';
             }
         });
+    }
 
-        // Filter typeahead results (search suggestions)
+    /**
+     * Filters search suggestions based on BLOCKED_WORDS_SEARCH_SUGGESTIONS
+     * Uses the same word group logic as posts but with a separate word list
+     */
+    function hideBlockedSearchResults() {
         const typeaheadResults = document.querySelectorAll('div[data-testid="typeaheadResult"]');
         typeaheadResults.forEach(result => {
             const text = result.textContent.toLowerCase();
-            if (BLOCKED_WORDS.length > 0 && BLOCKED_WORDS.some(group => containsAllWords(text, group))) {
+            if (BLOCKED_WORDS_SEARCH_SUGGESTIONS.length > 0 && BLOCKED_WORDS_SEARCH_SUGGESTIONS.some(group => containsAllWords(text, group))) {
                 result.style.display = 'none';
             }
         });
@@ -80,8 +78,6 @@
 
     /**
      * Hides posts from muted accounts
-     * Identifies muted posts by their notification text
-     * Uses display:none to prevent Twitter's re-rendering
      */
     function hideMutedPosts() {
         const elements = document.querySelectorAll('div[data-testid="cellInnerDiv"]');
@@ -96,7 +92,6 @@
 
     /**
      * Helper function to hide an element and all its following siblings
-     * Used primarily for "Discover more" sections where we need to remove subsequent recommendations
      * @param {Element} element - The starting element to hide
      */
     function hideElementAndSiblings(element) {
@@ -109,13 +104,13 @@
     }
 
     // MutationObserver watches for DOM changes and applies filters
-    // Necessary because Twitter dynamically loads content while scrolling
     const observer = new MutationObserver(() => {
         hideUnwantedSections();
-        hideBlockedContent();
+        hideBlockedPosts();
+        hideBlockedSearchResults();
         hideMutedPosts();
     });
 
-    // Start observing the document with the configured parameters
+    // Start observing the document
     observer.observe(document, { childList: true, subtree: true });
 })();
