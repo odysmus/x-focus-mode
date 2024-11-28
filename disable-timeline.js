@@ -34,9 +34,23 @@ const profileRedirectHandler = () => {
         }
     };
 
+    // Add URL change monitoring using MutationObserver
+    const observeUrlChanges = () => {
+        let lastUrl = location.href;
+        new MutationObserver(() => {
+            const url = location.href;
+            if (url !== lastUrl) {
+                lastUrl = url;
+                interceptHomeNavigation();
+            }
+        }).observe(document, { subtree: true, childList: true });
+    };
+
     // Intercept all navigation to home
     const interceptHomeNavigation = () => {
-        if (window.location.pathname === '/home' || window.location.pathname === '/') {
+        if (window.location.pathname === '/home' || 
+            window.location.pathname === '/' || 
+            window.location.href.includes('/home')) {
             redirectToProfile();
             return true;
         }
@@ -47,7 +61,7 @@ const profileRedirectHandler = () => {
     const originalPushState = history.pushState;
     history.pushState = function() {
         const url = arguments[2];
-        if (url === '/home' || url === '/') {
+        if (url === '/home' || url === '/' || url.includes('/home')) {
             redirectToProfile();
             return;
         }
@@ -57,7 +71,7 @@ const profileRedirectHandler = () => {
     const originalReplaceState = history.replaceState;
     history.replaceState = function() {
         const url = arguments[2];
-        if (url === '/home' || url === '/') {
+        if (url === '/home' || url === '/' || url.includes('/home')) {
             redirectToProfile();
             return;
         }
@@ -72,6 +86,7 @@ const profileRedirectHandler = () => {
         const leadsToHome = 
             target.getAttribute('href') === '/home' ||
             target.getAttribute('href') === '/' ||
+            target.getAttribute('href')?.includes('/home') ||
             (target.getAttribute('role') === 'button' && 
              target.textContent.includes('Home')) ||
             target.getAttribute('aria-label')?.includes('Home');
@@ -85,7 +100,10 @@ const profileRedirectHandler = () => {
 
     // Add navigation event listeners
     window.addEventListener('popstate', () => interceptHomeNavigation());
-    window.addEventListener('load', () => interceptHomeNavigation());
+    window.addEventListener('load', () => {
+        interceptHomeNavigation();
+        observeUrlChanges();
+    });
     
     // Initial check
     interceptHomeNavigation();
@@ -101,7 +119,9 @@ if (document.readyState === 'loading') {
 // Add early redirect script to head
 const earlyRedirect = document.createElement('script');
 earlyRedirect.textContent = `
-    if (window.location.pathname === '/home' || window.location.pathname === '/') {
+    if (window.location.pathname === '/home' || 
+        window.location.pathname === '/' || 
+        window.location.href.includes('/home')) {
         const storedPath = sessionStorage.getItem('userProfilePath');
         if (storedPath) {
             window.location.replace(storedPath);
