@@ -5,6 +5,7 @@
         [aria-label="Communities"],
         [aria-label="Jobs"],
         [aria-label="Trending"],
+        [aria-label="Premium"],
         [data-testid="DMDrawer"],
         [aria-label="Timeline: Explore"] {
             display: none !important;
