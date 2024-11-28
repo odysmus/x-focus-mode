@@ -1,135 +1,151 @@
 // Post Dialog Persistence
-  const preventClose = (e) => {
-      if (e.key === 'Escape') {
-          e.stopPropagation();
-          e.preventDefault();
-          return false;
-      }
-  };
+  const composeHandler = () => {
+    let isPosting = false;
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
 
-  // Override pushState once at the start
-  history.pushState = ((f) => function pushState() {
-      const ret = f.apply(this, arguments);
-      window.dispatchEvent(new Event('pushstate'));
-      return ret;
-  })(history.pushState);
+    // Function to maintain compose modal
+    const maintainCompose = () => {
+        if (isPosting) {
+            // Use the original pushState to avoid conflicts
+            originalPushState.call(history, {}, '', '/compose/post');
+            return true;
+        }
+        return false;
+    };
 
-  // Override replaceState
-  history.replaceState = ((f) => function replaceState() {
-      const ret = f.apply(this, arguments);
-      window.dispatchEvent(new Event('replacestate'));
-      return ret;
-  })(history.replaceState);
+    // Prevent dialog from being closed
+    const preventDialogClose = () => {
+        const closeButton = document.querySelector('[aria-label="Close"]');
+        if (closeButton) {
+            closeButton.style.display = 'none';
+        }
 
-  const redirectToCompose = () => {
-      // Add a session storage flag to track if we've already left compose
-      if (window.location.pathname === '/compose/post') {
-          sessionStorage.setItem('leftCompose', 'false');
-      } else {
-          sessionStorage.setItem('leftCompose', 'true');
-      }
+        // Prevent Escape key from closing the dialog
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
 
-      // Only redirect if we're going directly from compose to home
-      // and haven't navigated elsewhere yet
-      if (window.location.pathname === '/home' && 
-          document.referrer.endsWith('/compose/post') &&
-          sessionStorage.getItem('leftCompose') === 'false') {
-          window.location.href = '/compose/post';
-      }
-  };
+        // Prevent clicking outside to close
+        document.addEventListener('click', (e) => {
+            if (e.target.getAttribute('role') === 'presentation') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
 
-  function initializeComposeBehavior() {
-      // Remove existing listeners first to prevent duplicates
-      document.removeEventListener('keydown', preventClose, true);
-      window.removeEventListener('pushstate', checkForComposePage);
-      window.removeEventListener('popstate', checkForComposePage);
-      window.removeEventListener('replacestate', checkForComposePage);
+        // Prevent closing when text field is selected
+        const textField = document.querySelector('[data-testid="tweetTextarea_0"]');
+        if (textField) {
+            textField.addEventListener('focus', () => {
+                isPosting = true;
+                window.__isComposing = true;
+            });
+        }
+    };
 
-      // Only add compose-specific behavior when actually on compose page
-      if (location.pathname === '/compose/post') {
-          document.addEventListener('keydown', preventClose, true);
-      }
-  }
+    // Add URL change monitoring
+    const observeUrlChanges = () => {
+        let lastUrl = location.href;
+        new MutationObserver(() => {
+            const url = location.href;
+            if (url !== lastUrl) {
+                lastUrl = url;
+                if (isPosting) {
+                    maintainCompose();
+                    preventDialogClose();
+                }
+            }
+        }).observe(document, { subtree: true, childList: true });
+    };
 
-  // Watch for URL changes
-  function checkForComposePage() {
-      // Only initialize compose behavior if we're actually on compose page
-      if (location.pathname === '/compose/post') {
-          setTimeout(initializeComposeBehavior, 0);
-      } else {
-          // Remove compose-specific behavior when leaving compose page
-          document.removeEventListener('keydown', preventClose, true);
-      }
-  }
+    // Watch for tweet button clicks
+    document.addEventListener('click', (e) => {
+        const tweetButton = e.target.closest('[data-testid="tweetButton"]');
+        if (!tweetButton) return;
+        
+        const isComposePostButton = tweetButton.closest('[aria-label*="Post"]') || 
+                                  tweetButton.getAttribute('aria-label')?.includes('Post');
+        
+        if (isComposePostButton) {
+            isPosting = true;
+            window.__isComposing = true;
+            preventDialogClose();
+            
+            // Reset flags after the post action completes
+            setTimeout(() => {
+                if (!document.querySelector('[aria-label*="Post"]')) {
+                    isPosting = false;
+                    window.__isComposing = false;
+                }
+            }, 1000);
+            return;
+        }
 
-  // Initial checks
-  if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-          redirectToCompose();
-          checkForComposePage();
-      });
-  } else {
-      // If DOMContentLoaded has already fired
-      redirectToCompose();
-      checkForComposePage();
-  }
+        // For the main tweet button
+        e.preventDefault();
+        e.stopPropagation();
+        originalPushState.call(history, {}, '', '/compose/post');
+        preventDialogClose();
+    });
 
-  // Watch for navigation events
-  window.addEventListener('popstate', () => {
-      redirectToCompose();
-      checkForComposePage();
-  });
-  window.addEventListener('pushstate', checkForComposePage);
-  window.addEventListener('replacestate', checkForComposePage);
+    // Override history methods
+    history.pushState = function() {
+        if (isPosting) {
+            arguments[2] = '/compose/post';
+        }
+        return originalPushState.apply(this, arguments);
+    };
 
-  // Watch for URL changes using MutationObserver
-  const observer = new MutationObserver(() => {
-      if (location.pathname === '/compose/post') {
-          initializeComposeBehavior();
-      }
-  });
+    history.replaceState = function() {
+        if (isPosting) {
+            arguments[2] = '/compose/post';
+        }
+        return originalReplaceState.apply(this, arguments);
+    };
 
-  // Watch for tweet button click
-  document.addEventListener('click', (e) => {
-      const tweetButton = e.target.closest('[data-testid="tweetButton"]');
-      if (tweetButton) {
-          sessionStorage.setItem('justTweeted', 'true');
-          window.location.href = '/compose/post';
-      }
-  });
+    // Block browser back button and page closing
+    window.addEventListener('beforeunload', (e) => {
+        if (isPosting) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
 
-  // Keep compose modal open after posting
-  history.pushState = ((f) => function pushState() {
-      const ret = f.apply(this, arguments);
-      window.dispatchEvent(new Event('pushstate'));
-      return ret;
-  })(history.pushState);
+    // Add navigation event listeners
+    window.addEventListener('popstate', (e) => {
+        if (isPosting) {
+            e.preventDefault();
+            maintainCompose();
+            preventDialogClose();
+        }
+    });
+    
+    window.addEventListener('pushstate', (e) => {
+        if (isPosting) {
+            maintainCompose();
+            preventDialogClose();
+        }
+    });
+    
+    window.addEventListener('load', () => {
+        maintainCompose();
+        observeUrlChanges();
+        preventDialogClose();
+    });
 
-  const maintainComposePath = () => {
-      // Only redirect if we're coming from a tweet action
-      if (sessionStorage.getItem('justTweeted') === 'true' && 
-          document.referrer.includes('/compose/post')) {
-          history.pushState({}, '', '/compose/post');
-          sessionStorage.setItem('justTweeted', 'false');
-      }
-  };
+    // Initialize URL observer
+    observeUrlChanges();
+};
 
-  window.addEventListener('pushstate', maintainComposePath);
-  window.addEventListener('popstate', maintainComposePath);
-
-
-
-  // Start observing once DOM is ready
-  if (document.body) {
-      observer.observe(document.body, {
-          childList: true,
-          subtree: true
-      });
-  } else {
-      document.addEventListener('DOMContentLoaded', () => {
-          observer.observe(document.body, {
-              childList: true,
-              subtree: true
-          });
-      });
-  }
+// Initialize as early as possible
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', composeHandler);
+} else {
+    composeHandler();
+}
