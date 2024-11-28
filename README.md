@@ -28,8 +28,10 @@ Puts you in control of your timeline, curate your inputs with accounts that alig
 Curate the content you want to see, remove unwanted posts from capturing your attention.
 - 🔥 Removes the following sections: Discover more, More replies, Posts from muted accounts
 - 🔍 Removes all posts and search results that contain the word or group of words you add into:
-  - const BLOCKED_WORDS_POSTS = ['word','two words','just three words'];
-  - const BLOCKED_WORDS_SEARCH_SUGGESTIONS = ['word','two words','just three words'];
+  ```
+  const BLOCKED_WORDS_POSTS = ['word','two words','just three words'];
+  const BLOCKED_WORDS_SEARCH_SUGGESTIONS = ['word','two words','just three words'];
+  ```
 
 ### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
 Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
