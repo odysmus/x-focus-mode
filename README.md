@@ -13,7 +13,7 @@ A thoughtfully crafted essentialist visual overhaul.
 - 🔥 Removes visual noise (right sidebar, who to follow, trending, +)
 
 #### 📄 keep-writing.js
-Transform the posting experience into a focused writing environment, letting you maintain your creative flow without interruption. Enables consecutive posting without getting distracted by the feed
+Transform the posting experience into a focused writing environment, letting you maintain your creative flow without interruption. Enables consecutive posting without getting distracted by the feed.
 - 📍 Stays on the dedicated posting page (x.com/compose/post)
 - ✋ Prevents automatic redirect to home feed after posting
 
