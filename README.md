@@ -31,7 +31,8 @@ Tired of wasting hours to mindless scrolling? Transform your X experience from a
 ### 📄 [content-filter.js](https://github.com/odysmus/X-Focus-Mode/blob/main/content-filter.js)
 Curate the content you want to see, remove unwanted posts from capturing your attention.
 - 🔥 Section Removal: Discover more, More replies, Posts from muted accounts
-- 🎯 Removes all posts that contain the word or group of words you add into → const BLOCKED_WORDS = ['word','two words','just three words'];
+- 🎯 Removes all posts that contain the word or group of words you add into:
+     const BLOCKED_WORDS = ['word','two words','just three words'];
 
 # How to use
 OPTION 1: Install a browser with the ability to customize sites like [Arc browser](https://arc.net/). For Arc, create a "New Boost" while on x.com, copy and paste the code into the boost floating window. Css code into css tab and viceversa for js. Restart tab and enjoy. (I do this)
