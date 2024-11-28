@@ -25,8 +25,8 @@ Puts you in control of your timeline, curate your inputs with accounts that alig
 - 🔥 Removes all "For you" tab appearances
 
 ### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
-Use X as a posting tool. Completely disable the home timeline, your profile becomes home.
-- 🏠 Automatically redirects from home timeline to your profile
+Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
+- 🏠 Automatically redirects from home timeline to your profile. Your profile is home now.
 
 
 # How to use
