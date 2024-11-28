@@ -53,19 +53,27 @@
     }
 
     /**
-     * Filters tweets containing word groups from BLOCKED_WORDS
+     * Filters tweets and search results containing word groups from BLOCKED_WORDS
      * For each word group, all words in that group must be present to trigger hiding
      * Case-insensitive matching
      */
     function hideBlockedContent() {
+        // Filter tweets
         const posts = document.querySelectorAll('div[data-testid="tweetText"]');
-        
         posts.forEach(post => {
             const text = post.textContent.toLowerCase();
-            // Check if any word group matches (OR condition between groups)
             if (BLOCKED_WORDS.length > 0 && BLOCKED_WORDS.some(group => containsAllWords(text, group))) {
                 const tweet = post.closest('div[data-testid="cellInnerDiv"]');
                 if (tweet) tweet.style.display = 'none';
+            }
+        });
+
+        // Filter typeahead results (search suggestions)
+        const typeaheadResults = document.querySelectorAll('div[data-testid="typeaheadResult"]');
+        typeaheadResults.forEach(result => {
+            const text = result.textContent.toLowerCase();
+            if (BLOCKED_WORDS.length > 0 && BLOCKED_WORDS.some(group => containsAllWords(text, group))) {
+                result.style.display = 'none';
             }
         });
     }
