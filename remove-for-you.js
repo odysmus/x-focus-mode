@@ -5,18 +5,23 @@ const tabHandler = new MutationObserver(() => {
         return;
     }
 
-    const tabList = document.querySelector('[role="tablist"][data-testid="ScrollSnap-List"]');
-    if (tabList) {
-        // Find the "Following" tab
-        const followingTab = Array.from(tabList.children).find(
-            tab => tab.textContent.includes('Following')
-        );
-        // Click the "Following" tab if it's not already selected
-        if (followingTab && !followingTab.getAttribute('aria-selected')) {
-            const clickableElement = followingTab.querySelector('a, button') || followingTab;
-            clickableElement.click();
-            tabHandler.disconnect(); // Disconnect after successful click
-        }
+    // Find all tabs with role="tab"
+    const tabs = document.querySelectorAll('[role="tab"]');
+    const followingTab = Array.from(tabs).find(tab => 
+        tab.textContent.includes('Following') || 
+        tab.getAttribute('aria-label')?.includes('Following')
+    );
+
+    // Click the "Following" tab if found and not already selected
+    if (followingTab && followingTab.getAttribute('aria-selected') === 'false') {
+        followingTab.click();
+        
+        // Verify the click worked
+        setTimeout(() => {
+            if (followingTab.getAttribute('aria-selected') === 'true') {
+                tabHandler.disconnect();
+            }
+        }, 100);
     }
 });
 
