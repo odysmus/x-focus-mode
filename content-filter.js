@@ -4,8 +4,13 @@
     // Configuration arrays for content filtering
     // BLOCKED_SECTIONS: Hides UI sections and their following content (e.g., "Discover more" recommendations)
     const BLOCKED_SECTIONS = ['Discover more', 'More replies'];
-    // BLOCKED_WORDS: Array of words to filter from tweets (case-insensitive) example: ['test','word'] the script would hide any tweet that contains either "test" or "word" in its text content
-    const BLOCKED_WORDS = [];
+    
+    // BLOCKED_WORDS: Add space-separated words to filter (case-insensitive)
+    // Example: const BLOCKED_WORDS = `test tweet remove`.trim().split(/\s+/).filter(Boolean); 
+                // This would remove all posts with the words test or tweet or remove
+    // Leave empty to show all tweets → const BLOCKED_WORDS = ``.trim().split(/\s+/).filter(Boolean);
+    const BLOCKED_WORDS = ``.trim().split(/\s+/).filter(Boolean);
+
     // Text that appears on posts from muted accounts
     const MUTED_TEXT = 'This Post is from an account you muted.';
 
