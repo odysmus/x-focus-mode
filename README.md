@@ -4,7 +4,7 @@ Custom theme for x.com (twitter) to help you focus on writing and reading with p
 Perfect for users seeking a distraction-free X experience focused purely on creating content and consuming with intention.
 
 # Features
-### 📄 [custom.css](https://github.com/odysmus/X-Focus-Mode/blob/main/custom.css)
+### 📄 [theme.css](https://github.com/odysmus/X-Focus-Mode/blob/main/theme.css)
 A thoughtfully crafted essentialist visual overhaul.
 - 🪧 Clean, distraction-free post visualization
 - 🥷 Auto hide and show on hover post interaction buttons
