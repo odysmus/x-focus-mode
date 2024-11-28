@@ -91,8 +91,11 @@
 /* Tweet Modifications */
   /* Tweet Spacing */
       [data-testid="tweet"]:not(:has(.css-175oi2r.r-1bnu78o.r-f8sm7e.r-m5arl1.r-1p0dtai.r-1d2f490.r-u8s1d.r-zchlnj.r-ipm5af)) {
-          margin-top: 17px !important;
+          padding-top: 17px !important;
       }
+    button[aria-expanded="false"][aria-haspopup="menu"][aria-label="More"][role="button"][data-testid="caret"] {
+        margin-top: -13px !important;
+    }
 
   /* Interaction Button Spacing */
       .css-175oi2r.r-1kbdv8c.r-18u37iz.r-1wtj0ep.r-1ye8kvj.r-1s2bzr4 {
