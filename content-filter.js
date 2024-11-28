@@ -22,6 +22,8 @@
 
     /**
      * Scans for and hides UI sections like "Discover more" or "More replies"
+     * Looks for headings within tweet containers and hides matching sections
+     * Also removes all following sibling elements to prevent partial content
      */
     function hideUnwantedSections() {
         const elements = document.querySelectorAll('div[data-testid="cellInnerDiv"]');
@@ -78,6 +80,8 @@
 
     /**
      * Hides posts from muted accounts
+     * Identifies muted posts by their notification text
+     * Uses display:none to prevent Twitter's re-rendering
      */
     function hideMutedPosts() {
         const elements = document.querySelectorAll('div[data-testid="cellInnerDiv"]');
@@ -92,6 +96,7 @@
 
     /**
      * Helper function to hide an element and all its following siblings
+     * Used primarily for "Discover more" sections where we need to remove subsequent recommendations
      * @param {Element} element - The starting element to hide
      */
     function hideElementAndSiblings(element) {
@@ -104,6 +109,7 @@
     }
 
     // MutationObserver watches for DOM changes and applies filters
+    // Necessary because Twitter dynamically loads content while scrolling
     const observer = new MutationObserver(() => {
         hideUnwantedSections();
         hideBlockedPosts();
