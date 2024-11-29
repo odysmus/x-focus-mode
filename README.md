@@ -1,5 +1,5 @@
 # X-Focus-Mode
-Custom theme for x.com (twitter) to help you focus on writing and reading with purpose.
+Custom theme and scripts for x.com (twitter) to help you focus on writing and reading with purpose.
 
 Perfect for users seeking a distraction-free X experience focused purely on creating content and consuming with intention.
 
