@@ -6,9 +6,12 @@ const profileRedirectHandler = () => {
     const findUserProfile = () => {
         const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
         if (profileLink) {
-            userProfilePath = profileLink.getAttribute('href');
-            // Store in sessionStorage for instant access
-            sessionStorage.setItem('userProfilePath', userProfilePath);
+            const newProfilePath = profileLink.getAttribute('href');
+            // Only update if the path has changed
+            if (newProfilePath !== userProfilePath) {
+                userProfilePath = newProfilePath;
+                sessionStorage.setItem('userProfilePath', userProfilePath);
+            }
             return true;
         }
         return false;
@@ -44,6 +47,13 @@ const profileRedirectHandler = () => {
                 interceptHomeNavigation();
             }
         }).observe(document, { subtree: true, childList: true });
+    };
+
+    // Add profile path monitoring using MutationObserver
+    const observeProfileChanges = () => {
+        new MutationObserver(() => {
+            findUserProfile();
+        }).observe(document.body, { subtree: true, childList: true });
     };
 
     // Intercept all navigation to home
@@ -103,6 +113,7 @@ const profileRedirectHandler = () => {
     window.addEventListener('load', () => {
         interceptHomeNavigation();
         observeUrlChanges();
+        observeProfileChanges();
     });
     
     // Initial check
