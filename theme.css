@@ -1,6 +1,7 @@
 /* Element Removal */
     /* Remove Navigation Items */
         [aria-label="Home"],
+        [aria-label="Home (New unread posts)"],
         [aria-label="Verified Orgs"],
         [aria-label="Communities"],
         [aria-label="Jobs"],
