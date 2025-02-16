@@ -31,9 +31,14 @@ Curate the content you want to see, remove unwanted posts from capturing your at
   - const BLOCKED_WORDS_POSTS = ['word','two words','just three words'];
   - const BLOCKED_WORDS_SEARCH_SUGGESTIONS = ['word','two words','just three words'];
 
-### 📄 [disable-timeline.js](https://github.com/odysmus/X-Focus-Mode/blob/main/disable-timeline.js)
+
 Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
-- 🏠 Automatically redirects from home timeline to your profile. Your profile is home now.
+
+### 📄 [home-is-profile.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-profile.js)
+- 🏠 Automatically redirects from home timeline to your profile.
+  
+### 📄 [home-is-post-composer.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-post-composer.js)
+- ✍️ Automatically redirects from home timeline to the post composer.
 
 # How to use
 OPTION 1: Install a browser with the ability to customize sites like [Arc browser](https://arc.net/). For Arc, create a "New Boost" while on x.com, copy and paste the code into the boost floating window. Css code into css tab and viceversa for js. Restart tab and enjoy. (I do this)
