@@ -1,142 +1,159 @@
 // Profile Redirect Handler - Instant home to profile redirect
-const profileRedirectHandler = () => {
-    let userProfilePath = '';
-    
-    // Function to find and store user's profile path
-    const findUserProfile = () => {
+(() => {
+    'use strict';
+
+    // Function to check if URL should be redirected
+    function shouldRedirect(url) {
+        try {
+            const urlObj = new URL(url);
+            return urlObj.pathname === '/home' || 
+                   urlObj.pathname === '/' || 
+                   urlObj.pathname.includes('/home');
+        } catch {
+            return false;
+        }
+    }
+
+    // Function to get profile path
+    function getProfilePath() {
+        return sessionStorage.getItem('userProfilePath') || null;
+    }
+
+    // Function to find profile link in the DOM
+    function findProfileLink() {
         const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
         if (profileLink) {
-            const newProfilePath = profileLink.getAttribute('href');
-            // Only update if the path has changed
-            if (newProfilePath !== userProfilePath) {
-                userProfilePath = newProfilePath;
-                sessionStorage.setItem('userProfilePath', userProfilePath);
+            const path = profileLink.getAttribute('href');
+            sessionStorage.setItem('userProfilePath', path);
+            return path;
+        }
+        return null;
+    }
+
+    // Function to navigate to profile
+    function navigateToProfile(event) {
+        let profilePath = getProfilePath();
+        
+        if (!profilePath) {
+            profilePath = findProfileLink();
+        }
+
+        if (profilePath) {
+            if (event) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
             }
+            window.location.replace('https://twitter.com' + profilePath);
             return true;
         }
         return false;
-    };
+    }
 
-    // Get stored profile path
-    userProfilePath = sessionStorage.getItem('userProfilePath');
+    // Intercept before page loads
+    window.addEventListener('beforeunload', (event) => {
+        const targetUrl = window.location.href;
+        if (shouldRedirect(targetUrl)) {
+            const profilePath = getProfilePath();
+            if (profilePath) {
+                event.preventDefault();
+                window.location.replace('https://twitter.com' + profilePath);
+                return false;
+            }
+        }
+    }, true);
 
-    // Instant redirect function
-    const redirectToProfile = () => {
-        // If we have the path stored, use it immediately
-        if (userProfilePath) {
-            window.location.replace(userProfilePath); // Using replace to prevent back button issues
+    // Intercept clicks before they trigger navigation
+    document.addEventListener('click', (event) => {
+        const target = event.target.closest('a, [role="link"], [role="button"]');
+        if (!target) return;
+
+        const href = target.getAttribute('href');
+        if (href && shouldRedirect(href)) {
+            navigateToProfile(event);
+        }
+    }, true);
+
+    // Override window.location
+    const originalAssign = window.location.assign;
+    const originalReplace = window.location.replace;
+    const originalHref = Object.getOwnPropertyDescriptor(window.location, 'href');
+
+    window.location.assign = function(url) {
+        if (shouldRedirect(url)) {
+            navigateToProfile();
             return;
         }
-
-        // If no stored path, find it and redirect
-        if (findUserProfile()) {
-            window.location.replace(userProfilePath);
-        } else {
-            // If still not found, retry once quickly
-            setTimeout(findUserProfile, 50);
-        }
+        return originalAssign.apply(this, arguments);
     };
 
-    // Add URL change monitoring using MutationObserver
-    const observeUrlChanges = () => {
-        let lastUrl = location.href;
-        new MutationObserver(() => {
-            const url = location.href;
-            if (url !== lastUrl) {
-                lastUrl = url;
-                interceptHomeNavigation();
+    window.location.replace = function(url) {
+        if (shouldRedirect(url)) {
+            navigateToProfile();
+            return;
+        }
+        return originalReplace.apply(this, arguments);
+    };
+
+    Object.defineProperty(window.location, 'href', {
+        set(url) {
+            if (shouldRedirect(url)) {
+                navigateToProfile();
+                return;
             }
-        }).observe(document, { subtree: true, childList: true });
-    };
-
-    // Add profile path monitoring using MutationObserver
-    const observeProfileChanges = () => {
-        new MutationObserver(() => {
-            findUserProfile();
-        }).observe(document.body, { subtree: true, childList: true });
-    };
-
-    // Intercept all navigation to home
-    const interceptHomeNavigation = () => {
-        if (window.location.pathname === '/home' || 
-            window.location.pathname === '/' || 
-            window.location.href.includes('/home')) {
-            redirectToProfile();
-            return true;
+            return originalHref.set.call(this, url);
         }
-        return false;
-    };
+    });
 
-    // Override history methods to catch navigation
+    // Override history methods
     const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
     history.pushState = function() {
-        const url = arguments[2];
-        if (url === '/home' || url === '/' || url.includes('/home')) {
-            redirectToProfile();
+        if (arguments[2] && shouldRedirect(arguments[2])) {
+            navigateToProfile();
             return;
         }
         return originalPushState.apply(this, arguments);
     };
 
-    const originalReplaceState = history.replaceState;
     history.replaceState = function() {
-        const url = arguments[2];
-        if (url === '/home' || url === '/' || url.includes('/home')) {
-            redirectToProfile();
+        if (arguments[2] && shouldRedirect(arguments[2])) {
+            navigateToProfile();
             return;
         }
         return originalReplaceState.apply(this, arguments);
     };
 
-    // Intercept clicks
-    document.addEventListener('click', (e) => {
-        const target = e.target.closest('a, [role="link"], [role="button"]');
-        if (!target) return;
-
-        const leadsToHome = 
-            target.getAttribute('href') === '/home' ||
-            target.getAttribute('href') === '/' ||
-            target.getAttribute('href')?.includes('/home') ||
-            (target.getAttribute('role') === 'button' && 
-             target.textContent.includes('Home')) ||
-            target.getAttribute('aria-label')?.includes('Home');
-
-        if (leadsToHome) {
-            e.preventDefault();
-            e.stopPropagation();
-            redirectToProfile();
+    // Monitor navigation events
+    window.addEventListener('popstate', (event) => {
+        if (shouldRedirect(window.location.href)) {
+            navigateToProfile(event);
         }
     }, true);
 
-    // Add navigation event listeners
-    window.addEventListener('popstate', () => interceptHomeNavigation());
-    window.addEventListener('load', () => {
-        interceptHomeNavigation();
-        observeUrlChanges();
-        observeProfileChanges();
-    });
-    
-    // Initial check
-    interceptHomeNavigation();
-};
-
-// Initialize as early as possible
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', profileRedirectHandler);
-} else {
-    profileRedirectHandler();
-}
-
-// Add early redirect script to head
-const earlyRedirect = document.createElement('script');
-earlyRedirect.textContent = `
-    if (window.location.pathname === '/home' || 
-        window.location.pathname === '/' || 
-        window.location.href.includes('/home')) {
-        const storedPath = sessionStorage.getItem('userProfilePath');
-        if (storedPath) {
-            window.location.replace(storedPath);
+    window.addEventListener('hashchange', (event) => {
+        if (shouldRedirect(window.location.href)) {
+            navigateToProfile(event);
         }
+    }, true);
+
+    // Check initial URL
+    if (shouldRedirect(window.location.href)) {
+        navigateToProfile();
     }
-`;
-document.head.insertBefore(earlyRedirect, document.head.firstChild);
+
+    // Observe DOM for profile link
+    const observer = new MutationObserver(() => {
+        if (!getProfilePath()) {
+            const path = findProfileLink();
+            if (path && shouldRedirect(window.location.href)) {
+                navigateToProfile();
+            }
+        }
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+})();
