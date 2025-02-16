@@ -10,8 +10,17 @@
                urlObj.pathname.includes('/home');
     }
 
+    // Function to remove home timeline elements
+    function removeHomeTimeline() {
+        const homeTimelineElements = document.querySelectorAll('[aria-label="Home timeline"]');
+        homeTimelineElements.forEach(element => element.remove());
+    }
+
     // Function to handle redirect
     function handleRedirect() {
+        // Remove home timeline elements
+        removeHomeTimeline();
+
         const storedPath = sessionStorage.getItem('userProfilePath');
         if (storedPath) {
             window.location.replace(storedPath);
@@ -20,6 +29,7 @@
 
         // If we don't have a stored path, we need to wait for the DOM and find it
         const checkForProfile = () => {
+            removeHomeTimeline(); // Also remove during checks
             const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
             if (profileLink) {
                 const newProfilePath = profileLink.getAttribute('href');
