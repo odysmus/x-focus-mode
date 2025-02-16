@@ -1,4 +1,4 @@
-// Profile Redirect Handler - Instant home to profile redirect
+// Home Redirect Handler - Instant home to profile redirect
 (() => {
     'use strict';
 
