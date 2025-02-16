@@ -1,4 +1,4 @@
-// Home Redirect Handler - Instant home to create post redirect
+// Home Redirect Handler - Instant home to post composer redirect
 (() => {
     'use strict';
 
