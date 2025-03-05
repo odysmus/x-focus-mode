@@ -1,5 +1,5 @@
 // Home Redirect Handler - Instant home to post composer redirect
-(() => {
+(function() {
     'use strict';
 
     // Function to check if URL should be redirected
