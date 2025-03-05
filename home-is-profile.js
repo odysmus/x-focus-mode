@@ -2,89 +2,153 @@
 (() => {
     'use strict';
 
-    // Function to check if URL should be redirected
-    function shouldRedirect(url) {
-        const urlObj = new URL(url);
-        return urlObj.pathname === '/home' || 
-               urlObj.pathname === '/' || 
-               urlObj.pathname.includes('/home');
-    }
-
-    // Function to remove home timeline elements
-    function removeHomeTimeline() {
-        const homeTimelineElements = document.querySelectorAll('[aria-label="Home timeline"]');
-        homeTimelineElements.forEach(element => element.remove());
-    }
-
-    // Function to handle redirect
-    function handleRedirect() {
-        // Remove home timeline elements
-        removeHomeTimeline();
-
+    // State and original methods
+    let redirecting = false, composing = false;
+    const origPush = history.pushState, origReplace = history.replaceState;
+    
+    // Core functions
+    const isHome = url => ['/', '/home'].includes(new URL(url).pathname) && !redirecting;
+    const isCompose = url => new URL(url).pathname.startsWith('/compose/post');
+    
+    const redirect = () => {
+        redirecting = true;
+        // Remove home timeline
+        document.querySelectorAll('[aria-label="Home timeline"]').forEach(el => el.remove());
+        
         const storedPath = sessionStorage.getItem('userProfilePath');
         if (storedPath) {
-            window.location.replace(storedPath);
+            loadProfile(storedPath);
+            setTimeout(() => redirecting = false, 1000);
             return;
         }
 
-        // If we don't have a stored path, we need to wait for the DOM and find it
-        const checkForProfile = () => {
-            removeHomeTimeline(); // Also remove during checks
+        // Find and load profile
+        const checkProfile = () => {
+            document.querySelectorAll('[aria-label="Home timeline"]').forEach(el => el.remove());
             const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
             if (profileLink) {
-                const newProfilePath = profileLink.getAttribute('href');
-                sessionStorage.setItem('userProfilePath', newProfilePath);
-                window.location.replace(newProfilePath);
+                const path = profileLink.getAttribute('href');
+                sessionStorage.setItem('userProfilePath', path);
+                loadProfile(path);
+                setTimeout(() => redirecting = false, 1000);
             } else {
-                // Keep checking until we find it
-                requestAnimationFrame(checkForProfile);
+                requestAnimationFrame(checkProfile);
             }
         };
 
-        // Start checking as soon as possible
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', checkForProfile);
-        } else {
-            checkForProfile();
-        }
-    }
-
-    // Check URL immediately
-    if (shouldRedirect(window.location.href)) {
-        handleRedirect();
-    }
-
-    // Monitor URL changes
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function() {
-        if (arguments[2] && shouldRedirect(arguments[2])) {
-            handleRedirect();
-            return;
-        }
-        return originalPushState.apply(this, arguments);
+        document.readyState === 'loading' 
+            ? document.addEventListener('DOMContentLoaded', checkProfile)
+            : checkProfile();
     };
 
-    history.replaceState = function() {
-        if (arguments[2] && shouldRedirect(arguments[2])) {
-            handleRedirect();
-            return;
-        }
-        return originalReplaceState.apply(this, arguments);
+    const loadProfile = path => {
+        origPush.call(history, {}, '', '/temp-redirect');
+        setTimeout(() => {
+            origPush.call(history, {}, '', path);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            setTimeout(() => {
+                const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
+                if (profileLink) profileLink.click();
+            }, 100);
+        }, 10);
     };
 
-    // Monitor navigation events
-    window.addEventListener('popstate', () => {
-        if (shouldRedirect(window.location.href)) {
-            handleRedirect();
+    // Navigation handler
+    const handleNav = (args, origMethod) => {
+        if (args[2] && typeof args[2] === 'string') {
+            const newUrl = args[2].startsWith('http') ? args[2] : window.location.origin + args[2];
+            
+            // Check if leaving compose mode
+            if (composing && !isCompose(newUrl) && !newUrl.includes('/profile')) {
+                composing = false;
+                redirect();
+                return;
+            }
+            
+            // Update compose flag and check for redirect
+            composing = isCompose(newUrl);
+            if (isHome(newUrl)) {
+                redirect();
+                return;
+            }
         }
+        return origMethod.apply(history, args);
+    };
+
+    // Override history methods
+    history.pushState = function() { return handleNav(arguments, origPush); };
+    history.replaceState = function() { return handleNav(arguments, origReplace); };
+
+    // Initial check
+    if (isHome(window.location.href)) {
+        redirect();
+    } else if (isCompose(window.location.href)) {
+        composing = true;
+    }
+
+    // Event listeners
+    window.addEventListener('popstate', e => {
+        const currentUrl = window.location.href;
+        const isCurrentCompose = isCompose(currentUrl);
+        
+        if (composing && !isCurrentCompose && !currentUrl.includes('/profile')) {
+            composing = false;
+            e.preventDefault();
+            e.stopPropagation();
+            redirect();
+            return;
+        }
+        
+        composing = isCurrentCompose;
+        if (isHome(currentUrl)) redirect();
     });
 
-    // Monitor hash changes
     window.addEventListener('hashchange', () => {
-        if (shouldRedirect(window.location.href)) {
-            handleRedirect();
-        }
+        composing = isCompose(window.location.href);
+        if (isHome(window.location.href)) redirect();
     });
+    
+    // Prevent Escape key from closing the compose dialog
+    document.addEventListener('keydown', e => {
+        if (composing && e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+    
+    document.addEventListener('click', e => {
+        // Handle home links
+        const link = e.target.closest('a[href]');
+        if (link && ['/home', '/'].includes(link.getAttribute('href'))) {
+            e.preventDefault();
+            redirect();
+        }
+        
+        // Handle compose close button
+        if (composing && e.target.closest('[aria-label="Close"]')) {
+            e.preventDefault();
+            e.stopPropagation();
+            composing = false;
+            redirect();
+        }
+    }, true);
+    
+    // Monitor URL changes
+    let lastUrl = location.href;
+    new MutationObserver(() => {
+        const url = location.href;
+        if (url !== lastUrl) {
+            lastUrl = url;
+            const wasComposing = composing;
+            const isCurrentCompose = isCompose(url);
+            composing = isCurrentCompose;
+            
+            if (wasComposing && !isCurrentCompose && !url.includes('/profile')) {
+                redirect();
+            }
+            
+            if (isHome(url)) redirect();
+        }
+    }).observe(document, { subtree: true, childList: true });
 })();
