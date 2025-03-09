@@ -8,7 +8,8 @@ OPTION 1: Install a browser with the ability to customize sites like [Arc browse
 
 OPTION 2: Find an extension capable of applying custom css and js to a site. For example, [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en-US).
 
----
+
+
 
 # Features
 
@@ -24,6 +25,8 @@ A thoughtfully crafted essentialist visual overhaul.
 
 ### 📄 [home-is-profile.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-profile.js)
 - 🏠 Automatically redirects from home timeline to your profile.
+- 🔥 Disables the home timeline (for you and following tabs)
+- ✍️ Automatically redirects to profile after posting.
 
 ---
 
@@ -47,7 +50,7 @@ Curate the content you want to see, remove unwanted posts from capturing your at
   - const BLOCKED_WORDS_SEARCH_SUGGESTIONS = ['word','two words','just three words'];
   
 ### 📄 [home-is-post-composer.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-post-composer.js)
-- ✍️ Automatically redirects from home timeline to the post composer.
+- 🏠 Automatically redirects from home timeline to the post composer.
 
 ---
 
