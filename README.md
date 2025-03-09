@@ -1,9 +1,19 @@
 # X-Focus-Mode
-Custom theme and scripts for x.com (twitter) to help you focus on writing and reading with purpose.
+Custom theme and scripts for x.com (twitter) to help you focus on building and posting without distractions.
 
-Perfect for users seeking a distraction-free X experience focused purely on creating content and consuming with intention.
+Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
+
+# How to use
+OPTION 1: Install a browser with the ability to customize sites like [Arc browser](https://arc.net/). For Arc, create a "New Boost" while on x.com, copy and paste the code into the boost floating window. Css code into css tab and viceversa for js. Restart tab and enjoy. (I do this)
+
+OPTION 2: Find an extension capable of applying custom css and js to a site. For example, [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en-US).
+
+---
 
 # Features
+
+Currently I use:
+
 ### 📄 [theme.css](https://github.com/odysmus/X-Focus-Mode/blob/main/theme.css)
 A thoughtfully crafted essentialist visual overhaul.
 - 🪧 Clean, distraction-free post visualization
@@ -11,6 +21,11 @@ A thoughtfully crafted essentialist visual overhaul.
 - 📝 Enhanced writing post UI, the pop up is now integrated
 - ↔️ Custom timeline width (700px) & left sidebar repositioning
 - 🔥 Removes visual noise (right sidebar, who to follow, trending, +)
+
+### 📄 [home-is-profile.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-profile.js)
+- 🏠 Automatically redirects from home timeline to your profile.
+
+---
 
 ### 📄 [keep-writing.js](https://github.com/odysmus/X-Focus-Mode/blob/main/keep-writing.js)
 > ⚠️ If you want to use this feature add it to the top of your JS file for the code to work
@@ -30,20 +45,9 @@ Curate the content you want to see, remove unwanted posts from capturing your at
 - 🔍 Removes all posts and search results that contain the word or group of words you add into:
   - const BLOCKED_WORDS_POSTS = ['word','two words','just three words'];
   - const BLOCKED_WORDS_SEARCH_SUGGESTIONS = ['word','two words','just three words'];
-
-
-Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
-
-### 📄 [home-is-profile.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-profile.js)
-- 🏠 Automatically redirects from home timeline to your profile.
   
 ### 📄 [home-is-post-composer.js](https://github.com/odysmus/X-Focus-Mode/blob/main/home-is-post-composer.js)
 - ✍️ Automatically redirects from home timeline to the post composer.
-
-# How to use
-OPTION 1: Install a browser with the ability to customize sites like [Arc browser](https://arc.net/). For Arc, create a "New Boost" while on x.com, copy and paste the code into the boost floating window. Css code into css tab and viceversa for js. Restart tab and enjoy. (I do this)
-
-OPTION 2: Find an extension capable of applying custom css and js to a site. For example, [Tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en-US).
 
 ---
 
