@@ -54,10 +54,10 @@ Curate the content you want to see, remove unwanted posts from capturing your at
 
 ---
 
-All code is commented with the intention of making it easy for you to adapt it to your liking, preferences and workflow.
+This repository has been created for you to adapt it to your liking, preferences and workflow.
 
 Technology is to be enjoyed as a catalyst for manifesting your potential not to be enslaved by it.
 
-Unlock the creative force.
+Unlock your creative force.
 
 
