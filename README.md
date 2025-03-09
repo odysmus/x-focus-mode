@@ -1,5 +1,5 @@
 # X-Focus-Mode
-Custom theme and scripts for x.com (twitter) to help you focus on building and posting without distractions.
+Custom theme and scripts for x.com to help you focus on building and posting without distractions.
 
 Tired of wasting hours to mindless scrolling? Transform your X experience from a time-sink into a powerful sharing tool. Benefit from the opportunities it offers without the pain that comes from consuming irrelevant content that has no real impact on your life. No need to delete your account - use X as a posting tool.
 
