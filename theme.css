@@ -1,5 +1,21 @@
-.r-11z020y {
-    background-color: rgb(0 0 0 / 0%) !important;
+.r-11z020y,
+#layers > div:nth-child(2) > div > div > div > div > div > div.css-175oi2r.r-1ny4l3l.r-18u37iz.r-1pi2tsx.r-1777fci.r-1xcajam.r-ipm5af.r-g6jmlv.r-1awozwy {
+  background-color: rgba(81, 86, 91, 0.31) !important;
+}
+
+/* Hide list banner */
+#react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > main > div > div > div > div.css-175oi2r.r-kemksi.r-1kqtdi0.r-1ua6aaf.r-th6na.r-1phboty.r-16y2uox.r-184en5c.r-1abdc3e.r-1lg4w6u.r-f8sm7e.r-13qz1uu.r-1ye8kvj > div > div.css-175oi2r.r-f8sm7e.r-13qz1uu.r-1ye8kvj > section > div > div > div:nth-child(1) > div > div.css-175oi2r.r-1adg3ll.r-1udh08x {
+  display: none !important;
+}
+
+/* Add border radius to profile banner */
+#react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > main > div > div > div > div.css-175oi2r.r-kemksi.r-1kqtdi0.r-1ua6aaf.r-th6na.r-1phboty.r-16y2uox.r-184en5c.r-1abdc3e.r-1lg4w6u.r-f8sm7e.r-13qz1uu.r-1ye8kvj > div > div:nth-child(3) > div > div > div:nth-child(1) > a > div > div.r-1p0dtai.r-1pi2tsx.r-1d2f490.r-u8s1d.r-ipm5af.r-13qz1uu > div {
+  border-radius: 15px !important;
+}
+
+/* Remove border under profile sections */
+.r-qklmqi {
+  border-bottom-width: 0px !important;
 }
 
 /* Element Removal */
