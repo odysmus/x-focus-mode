@@ -1,10 +1,25 @@
+/* X.com Custom Styles */
 .r-11z020y,
 #layers > div:nth-child(2) > div > div > div > div > div > div.css-175oi2r.r-1ny4l3l.r-18u37iz.r-1pi2tsx.r-1777fci.r-1xcajam.r-ipm5af.r-g6jmlv.r-1awozwy {
   background-color: rgba(81, 86, 91, 0.31) !important;
 }
+/* 
+div[data-testid="ScrollSnap-List"] > div[role="presentation"]:nth-child(6), [data-testid="ScrollSnap-nextButtonWrapper"] {
+  display: none !important;
+} */
+
+/* Hide back arrow */
+.r-s8bhmr.r-1habvwh.r-15ysp7h.r-1777fci.r-1pz39u2.css-175oi2r{
+    display: none !important;
+}
 
 /* Hide list banner */
 #react-root > div > div > div.css-175oi2r.r-1f2l425.r-13qz1uu.r-417010.r-18u37iz > main > div > div > div > div.css-175oi2r.r-kemksi.r-1kqtdi0.r-1ua6aaf.r-th6na.r-1phboty.r-16y2uox.r-184en5c.r-1abdc3e.r-1lg4w6u.r-f8sm7e.r-13qz1uu.r-1ye8kvj > div > div.css-175oi2r.r-f8sm7e.r-13qz1uu.r-1ye8kvj > section > div > div > div:nth-child(1) > div > div.css-175oi2r.r-1adg3ll.r-1udh08x {
+  display: none !important;
+}
+
+   /* Hide specified class combination */
+.css-175oi2r.r-sdzlij.r-1phboty.r-rs99b7.r-lrvibr.r-1ceczpf.r-lp5zef.r-3o4zer.r-o7ynqc.r-6416eg.r-1ny4l3l.r-1loqt21 {
   display: none !important;
 }
 
@@ -29,25 +44,33 @@
 [aria-label="Trending"],
 [aria-label="Premium"],
 [aria-label="Notifications"],
-[aria-label="Bookmarks"],
-[aria-label="Bookmark"],
-[aria-label="Lists"],
+/*[aria-label="Lists"],
+[aria-label="Articles"],*/
+/*[aria-label="Bookmarks"],
+[aria-label="Bookmark"],*/
+/*[aria-label="Search and explore"],*/
 [aria-label="New posts are available. Push the period key to go to the them."],
-[aria-label="Search and explore"],
 [aria-label="Timeline: Your Home Timeline"],
 [data-testid="DMDrawer"],
 [aria-label="Timeline: Explore"] {
     display: none !important;
 }
 
+/* hide bookmark button
+#id__j6aereogo6e > div.r-13awgt0.r-1h0z5md.r-18u37iz.css-175oi2r:nth-of-type(4){
+display: none !important;
+} */
+
+
+
 /* Remove explore tabs in search */
 [role="tablist"] a[href^="/explore/tabs/"],
 div[role="presentation"]:has(a[href^="/explore/tabs/"]) {
-    display: none !important;
+display: none !important;
 }
 /* Make border transparent for explore tabs container */
 .css-175oi2r.r-1awozwy.r-18u37iz.r-1igl3o0.r-rull8r.r-qklmqi:has(div[role="presentation"] a[href^="/explore/tabs/"]) {
-    border-bottom-color: transparent !important;
+border-bottom-color: transparent !important;
 }
 
 /* Hide specific links */
@@ -55,17 +78,27 @@ div[role="presentation"]:has(a[href^="/explore/tabs/"]) {
 [role="link"][href="https://ads.x.com/?ref=gl-tw-tw-twitter-ads-rweb"],
 [role="link"][href="/jobs"],
 [role="link"][href="/i/spaces/start"] {
-    display: none !important;
+display: none !important;
 }
+
+/* [role="presentation"]:has([role="tab"][href="/odysmus/articles"]) {
+display: none !important;
+} */
 
 /* Hide specific links as requested */
 [role="link"][href="/i/verified-orgs-signup"],
 [role="link"][href*="communities"],
-[role="link"][href*="bookmarks"],
+/*[role="link"][href*="bookmarks"],*/
 [role="link"][href*="premium"],
-[role="link"][href*="connect"],
-[role="link"][href*="lists"] {
-    display: none !important;
+[role="link"][href*="connect"]/*,
+[role="link"][href*="lists"]*/
+{
+display: none !important;
+}
+
+/* Remove the blue dot for new posts */
+.r-1ld3bg.r-615f2u.r-u8s1d.r-12rgx7y.r-lrvibr.r-1ozsyd3.r-1yadl64.r-sdzlij.r-l5o3uw.css-175oi2r{
+display: none !important;
 }
 
 /* Remove who to follow */
@@ -104,7 +137,7 @@ div[role="presentation"]:has(a[href^="/explore/tabs/"]) {
             [role="progressbar"]) .css-175oi2r.r-1ny4l3l.r-18u37iz.r-1pi2tsx.r-1777fci.r-1xcajam.r-ipm5af.r-g6jmlv.r-1habvwh {
         height: fit-content !important;
 
-        margin: -30px auto !important;
+        margin: 0px auto !important;
         position: fixed !important;
         top: 0px !important; /* Position at top with some margin */
         left: 50% !important;
