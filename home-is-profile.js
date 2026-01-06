@@ -1,154 +1,77 @@
-// Home Redirect Handler - Instant home to profile redirect
+// Home Redirect Handler - Always send /home → profile (minimal + reliable)
 (() => {
     'use strict';
 
-    // State and original methods
-    let redirecting = false, composing = false;
-    const origPush = history.pushState, origReplace = history.replaceState;
-    
-    // Core functions
-    const isHome = url => ['/', '/home'].includes(new URL(url).pathname) && !redirecting;
-    const isCompose = url => new URL(url).pathname.startsWith('/compose/post');
-    
-    const redirect = () => {
-        redirecting = true;
-        // Remove home timeline
-        document.querySelectorAll('[aria-label="Home timeline"]').forEach(el => el.remove());
-        
-        const storedPath = sessionStorage.getItem('userProfilePath');
-        if (storedPath) {
-            loadProfile(storedPath);
-            setTimeout(() => redirecting = false, 1000);
+    const PROFILE_PATH_KEY = 'userProfilePath';
+    const HOME_PATHS = new Set(['/', '/home']);
+
+    const isHomePath = (pathname) => HOME_PATHS.has(pathname);
+
+    const getProfileLink = () =>
+        document.querySelector('a[data-testid="AppTabBar_Profile_Link"]') ||
+        document.querySelector('a[aria-label="Profile"]') ||
+        document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
+
+    const storeProfilePath = (path) => {
+        if (!path) return;
+        try { sessionStorage.setItem(PROFILE_PATH_KEY, path); } catch { /* ignore */ }
+        try { localStorage.setItem(PROFILE_PATH_KEY, path); } catch { /* ignore */ }
+    };
+
+    const getStoredProfilePath = () => {
+        try {
+            return sessionStorage.getItem(PROFILE_PATH_KEY) || localStorage.getItem(PROFILE_PATH_KEY);
+        } catch {
+            return null;
+        }
+    };
+
+    const goProfile = () => {
+        // 1) Prefer a real click (lets X's router do the right thing)
+        const link = getProfileLink();
+        const href = link?.getAttribute?.('href');
+        if (href) storeProfilePath(href);
+        if (link) {
+            link.click();
             return;
         }
 
-        // Find and load profile
-        const checkProfile = () => {
-            document.querySelectorAll('[aria-label="Home timeline"]').forEach(el => el.remove());
-            const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
-            if (profileLink) {
-                const path = profileLink.getAttribute('href');
-                sessionStorage.setItem('userProfilePath', path);
-                loadProfile(path);
-                setTimeout(() => redirecting = false, 1000);
-            } else {
-                requestAnimationFrame(checkProfile);
-            }
-        };
-
-        document.readyState === 'loading' 
-            ? document.addEventListener('DOMContentLoaded', checkProfile)
-            : checkProfile();
+        // 2) Fallback: hard navigation if we have a cached profile path
+        const stored = getStoredProfilePath();
+        if (stored) window.location.assign(stored);
     };
 
-    const loadProfile = path => {
-        origPush.call(history, {}, '', '/temp-redirect');
-        setTimeout(() => {
-            origPush.call(history, {}, '', path);
-            window.dispatchEvent(new PopStateEvent('popstate'));
-            setTimeout(() => {
-                const profileLink = document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
-                if (profileLink) profileLink.click();
-            }, 100);
-        }, 10);
+    const handleHome = (e) => {
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
+        goProfile();
     };
 
-    // Navigation handler
-    const handleNav = (args, origMethod) => {
-        if (args[2] && typeof args[2] === 'string') {
-            const newUrl = args[2].startsWith('http') ? args[2] : window.location.origin + args[2];
-            
-            // Check if leaving compose mode
-            if (composing && !isCompose(newUrl) && !newUrl.includes('/profile')) {
-                composing = false;
-                redirect();
-                return;
-            }
-            
-            // Update compose flag and check for redirect
-            composing = isCompose(newUrl);
-            if (isHome(newUrl)) {
-                redirect();
-                return;
-            }
-        }
-        return origMethod.apply(history, args);
-    };
+    // If you land on /home (including new tab), immediately go to profile.
+    if (isHomePath(location.pathname)) goProfile();
 
-    // Override history methods
-    history.pushState = function() { return handleNav(arguments, origPush); };
-    history.replaceState = function() { return handleNav(arguments, origReplace); };
+    // Intercept clicks on the Home button/link.
+    document.addEventListener(
+        'click',
+        (e) => {
+            const link = e.target?.closest?.('a[href]');
+            if (!link) return;
 
-    // Initial check
-    if (isHome(window.location.href)) {
-        redirect();
-    } else if (isCompose(window.location.href)) {
-        composing = true;
-    }
+            const href = link.getAttribute('href');
+            const isHomeLink =
+                link.matches?.('a[data-testid="AppTabBar_Home_Link"]') ||
+                link.getAttribute('aria-label') === 'Home' ||
+                href === '/home' ||
+                href === '/';
 
-    // Event listeners
-    window.addEventListener('popstate', e => {
-        const currentUrl = window.location.href;
-        const isCurrentCompose = isCompose(currentUrl);
-        
-        if (composing && !isCurrentCompose && !currentUrl.includes('/profile')) {
-            composing = false;
-            e.preventDefault();
-            e.stopPropagation();
-            redirect();
-            return;
-        }
-        
-        composing = isCurrentCompose;
-        if (isHome(currentUrl)) redirect();
+            if (!isHomeLink) return;
+            handleHome(e);
+        },
+        true
+    );
+
+    // Catch back/forward navigation to /home.
+    window.addEventListener('popstate', () => {
+        if (isHomePath(location.pathname)) goProfile();
     });
-
-    window.addEventListener('hashchange', () => {
-        composing = isCompose(window.location.href);
-        if (isHome(window.location.href)) redirect();
-    });
-    
-    // Prevent Escape key from closing the compose dialog
-    document.addEventListener('keydown', e => {
-        if (composing && e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }, true);
-    
-    document.addEventListener('click', e => {
-        // Handle home links
-        const link = e.target.closest('a[href]');
-        if (link && ['/home', '/'].includes(link.getAttribute('href'))) {
-            e.preventDefault();
-            redirect();
-        }
-        
-        // Handle compose close button
-        if (composing && e.target.closest('[aria-label="Close"]')) {
-            e.preventDefault();
-            e.stopPropagation();
-            composing = false;
-            redirect();
-        }
-    }, true);
-    
-    // Monitor URL changes
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-        const url = location.href;
-        if (url !== lastUrl) {
-            lastUrl = url;
-            const wasComposing = composing;
-            const isCurrentCompose = isCompose(url);
-            composing = isCurrentCompose;
-            
-            if (wasComposing && !isCurrentCompose && !url.includes('/profile')) {
-                redirect();
-            }
-            
-            if (isHome(url)) redirect();
-        }
-    }).observe(document, { subtree: true, childList: true });
 })();

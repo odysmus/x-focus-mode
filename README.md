@@ -56,7 +56,7 @@ Curate the content you want to see, remove unwanted posts from capturing your at
 
 ### 📄 [lists-allowed-19-21.js](https://github.com/odysmus/X-Focus-Mode/blob/main/lists-allowed-19-21.js)
 - 🕖 Allows access to `x.com/i/lists/*` only from 19:00–21:00 (local time).
-- 🔁 Outside that window, redirects you to your profile (auto-detected; or set `PROFILE_PATH_OVERRIDE`).
+- 🔁 Outside that window, redirects you to your profile (clicks the Profile tab when available; otherwise uses cached profile path).
 
 ---
 
@@ -65,4 +65,3 @@ This repository has been created for you to adapt it to your liking, preferences
 Technology is to be enjoyed as a catalyst for manifesting your potential not to be enslaved by it.
 
 Unlock your creative force.
-

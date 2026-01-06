@@ -2,18 +2,12 @@
 (() => {
     'use strict';
 
-    // === Configuration ===
-    // Allowed window (local time). End is exclusive by default: [19:00, 21:00)
+    // Allowed window (local time). End is exclusive: [19:00, 21:00)
     const ALLOWED_START = { hour: 19, minute: 0 };
     const ALLOWED_END = { hour: 21, minute: 0 };
 
-    // Optional: hardcode your profile path (e.g. "/yourhandle") to skip DOM lookup.
-    const PROFILE_PATH_OVERRIDE = null;
-
-    // Storage key shared with other scripts in this repo.
     const PROFILE_PATH_KEY = 'userProfilePath';
 
-    // === Helpers ===
     const minutesSinceMidnight = (d) => d.getHours() * 60 + d.getMinutes();
     const toMinutes = ({ hour, minute }) => hour * 60 + minute;
 
@@ -27,141 +21,83 @@
         return current >= start || current < end; // handles windows spanning midnight
     };
 
-    const isListsPath = (pathname) => /^\/i\/lists\/[^/]+/.test(pathname);
+    const isListsPath = (pathname) => /^\/i\/lists(\/|$)/.test(pathname);
 
-    const findProfileLink = () => {
-        const selectors = [
-            'a[data-testid="AppTabBar_Profile_Link"]',
-            'a[aria-label="Profile"]',
-            'a[aria-label*="Profile"][role="link"]',
-            'a[href^="/"][role="link"][aria-label*="Profile"]',
-        ];
+    const getProfileLink = () =>
+        document.querySelector('a[data-testid="AppTabBar_Profile_Link"]') ||
+        document.querySelector('a[aria-label="Profile"]') ||
+        document.querySelector('a[href^="/"][role="link"][aria-label*="Profile"]');
 
-        for (const selector of selectors) {
-            const link = document.querySelector(selector);
-            const href = link?.getAttribute?.('href');
-            if (href && href.startsWith('/')) return link;
-        }
-        return null;
+    const storeProfilePath = (path) => {
+        if (!path) return;
+        try { sessionStorage.setItem(PROFILE_PATH_KEY, path); } catch { /* ignore */ }
+        try { localStorage.setItem(PROFILE_PATH_KEY, path); } catch { /* ignore */ }
     };
 
-    let redirecting = false;
+    const getStoredProfilePath = () => {
+        try { return sessionStorage.getItem(PROFILE_PATH_KEY) || localStorage.getItem(PROFILE_PATH_KEY); }
+        catch { return null; }
+    };
 
-    const navigateToProfilePath = (path) => {
-        if (!path) return false;
-        if (!path.startsWith('/')) path = `/${path}`;
-        if (location.pathname === path) return true;
+    const goProfile = () => {
+        const link = getProfileLink();
+        const href = link?.getAttribute?.('href');
+        if (href) storeProfilePath(href);
+        if (link) {
+            link.click();
+            return true;
+        }
 
-        // Use SPA-friendly navigation (like other scripts in this repo)
-        history.pushState({}, '', '/temp-redirect');
-        setTimeout(() => {
-            history.pushState({}, '', path);
-            window.dispatchEvent(new PopStateEvent('popstate'));
-            setTimeout(() => {
-                const link = findProfileLink();
-                if (link) link.click();
-            }, 50);
-        }, 10);
+        const stored = getStoredProfilePath();
+        if (stored) {
+            window.location.assign(stored);
+            return true;
+        }
 
+        // Last resort: bounce to /home (home redirect script can take over if present).
+        window.location.assign('/home');
         return true;
     };
 
-    const redirectToProfile = () => {
-        if (redirecting) return;
-        redirecting = true;
-        setTimeout(() => (redirecting = false), 15000);
+    const goProfileWithRetry = (maxMs = 2000) => {
+        if (goProfile()) return;
 
-        if (PROFILE_PATH_OVERRIDE) {
-            navigateToProfilePath(PROFILE_PATH_OVERRIDE);
-            setTimeout(() => (redirecting = false), 1000);
-            return;
-        }
-
-        const stored = sessionStorage.getItem(PROFILE_PATH_KEY);
-        if (stored) {
-            navigateToProfilePath(stored);
-            setTimeout(() => (redirecting = false), 1000);
-            return;
-        }
-
-        const tryFind = () => {
-            const link = findProfileLink();
-            const href = link?.getAttribute?.('href');
-            if (href) {
-                sessionStorage.setItem(PROFILE_PATH_KEY, href);
-                navigateToProfilePath(href);
-                setTimeout(() => (redirecting = false), 1000);
-                return;
-            }
-            requestAnimationFrame(tryFind);
+        const start = Date.now();
+        const tick = () => {
+            if (goProfile()) return;
+            if (Date.now() - start > maxMs) return;
+            requestAnimationFrame(tick);
         };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(tryFind), { once: true });
-        } else {
-            requestAnimationFrame(tryFind);
-        }
+        requestAnimationFrame(tick);
     };
 
     const gate = () => {
-        if (isListsPath(location.pathname) && !isWithinWindow()) {
-            redirectToProfile();
-        }
+        if (isListsPath(location.pathname) && !isWithinWindow()) goProfileWithRetry();
     };
 
-    // Initial check
+    const maybeBlockListsNavigation = (e) => {
+        if (isWithinWindow()) return;
+
+        const link = e.target?.closest?.('a[href]');
+        const href = link?.getAttribute?.('href');
+        if (!href) return;
+
+        const url = new URL(href, location.origin);
+        if (url.origin !== location.origin) return;
+        if (!isListsPath(url.pathname)) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation?.();
+        goProfileWithRetry();
+    };
+
+    // Initial check (direct navigation / new tab)
     gate();
 
-    // Block clicks to lists outside the allowed window
-    document.addEventListener(
-        'click',
-        (e) => {
-            const link = e.target?.closest?.('a[href]');
-            const href = link?.getAttribute?.('href');
-            if (!href) return;
-
-            const url = new URL(href, location.origin);
-            if (url.origin !== location.origin) return;
-
-            if (isListsPath(url.pathname) && !isWithinWindow()) {
-                e.preventDefault();
-                e.stopPropagation();
-                redirectToProfile();
-            }
-        },
-        true
-    );
-
-    // Observe navigation changes (SPA)
+    // In-app navigation guards (capture early so we don't "go through then redirect")
+    document.addEventListener('pointerdown', maybeBlockListsNavigation, true);
+    document.addEventListener('click', maybeBlockListsNavigation, true);
+    document.addEventListener('auxclick', maybeBlockListsNavigation, true);
     window.addEventListener('popstate', gate);
-    window.addEventListener('hashchange', gate);
-
-    // Best-effort URL change detector without clobbering other scripts
-    try {
-        const origPush = history.pushState;
-        const origReplace = history.replaceState;
-
-        history.pushState = function () {
-            const res = origPush.apply(this, arguments);
-            gate();
-            return res;
-        };
-        history.replaceState = function () {
-            const res = origReplace.apply(this, arguments);
-            gate();
-            return res;
-        };
-    } catch {
-        // ignore
-    }
-
-    // Fallback: watch for DOM mutations that typically accompany route changes
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-        const url = location.href;
-        if (url !== lastUrl) {
-            lastUrl = url;
-            gate();
-        }
-    }).observe(document, { subtree: true, childList: true });
 })();
